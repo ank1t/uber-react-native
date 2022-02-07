@@ -1,4 +1,4 @@
-# uber-react-native
+# uber-react-native - [App demo](./demo.mp4)
 Learning react native by trying to replicate the Uber ride sharing app.
 
 To run this project locally, you would be a Google Maps API key. Once available, plug in that value in the .env file in the project root directory. Make sure to not use quotes.
