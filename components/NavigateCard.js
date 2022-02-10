@@ -1,11 +1,14 @@
-import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-navigation";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { styles, toInputBoxStyles } from "../styles/MapScreenStyles";
 import { GOOGLE_MAPS_API_KEY } from "@env";
-import { useDispatch } from "react-redux";
-import { setDestination } from "../slices/navSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectTravelTimeInformation,
+  setDestination,
+} from "../slices/navSlice";
 import { useNavigation } from "@react-navigation/native";
 import NavFavorites from "./NavFavorites";
 import { Icon } from "react-native-elements";
@@ -24,11 +27,17 @@ export default function NavigateCard() {
     }
     return message;
   };
-  const dispatch = useDispatch()
-  const navigation = useNavigation()
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const travelTimeInfo = useSelector(selectTravelTimeInformation);
+
+  useEffect(() => {
+    if (!travelTimeInfo) return;
+    navigation.navigate("RideOptions");
+  }, [travelTimeInfo]);
 
   return (
-    <SafeAreaView style={styles.navigateCard} forceInset={{bottom: "always"}}>
+    <SafeAreaView style={styles.navigateCard} forceInset={{ bottom: "always" }}>
       <Text style={styles.navigateCardGreeting}> {getGreeting()}</Text>
       <View style={styles.inputContainer}>
         <GooglePlacesAutocomplete
@@ -45,29 +54,35 @@ export default function NavigateCard() {
           nearbyPlacesAPI="GooglePlacesSearch"
           debounce={400}
           onPress={(data, details = null) => {
-            dispatch(setDestination({
+            dispatch(
+              setDestination({
                 location: details.geometry.location,
-                description: data.description
-            }))
-            navigation.navigate("RideOptions")
+                description: data.description,
+              })
+            );
           }}
         />
       </View>
       <View style={styles.navFavContainer}>
-        <NavFavorites/>
+        <NavFavorites />
       </View>
       <View style={styles.bottomContainer}>
-          <TouchableOpacity 
+        <TouchableOpacity
           style={styles.ridesContainer}
           onPress={() => navigation.navigate("RideOptions")}
-          >
-            <Icon name="car" type="font-awesome" color="white" size={18}/>
-            <Text style={styles.ridesText}>Rides</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.eatsContainer}>
-            <Icon name="fast-food-outline" type="ionicon" color="black" size={18}/>
-            <Text style={styles.eatsText}>Eats</Text>
-          </TouchableOpacity>
+        >
+          <Icon name="car" type="font-awesome" color="white" size={18} />
+          <Text style={styles.ridesText}>Rides</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.eatsContainer}>
+          <Icon
+            name="fast-food-outline"
+            type="ionicon"
+            color="black"
+            size={18}
+          />
+          <Text style={styles.eatsText}>Eats</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
